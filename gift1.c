@@ -1,52 +1,82 @@
 /*
 ID: juanj031
 PROG: gift1
-LANG: C
+LANG: C 
 */
+
+#define MAX_PEOPLE 10
+#define MAX_NAME 32
 
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-		if(money > 0){
-			currentGiver->final_money_value += money;
-			// currentGiver->final_money_value +=  money%count;
-			r = money/count;
-			// currentGiver->final_money_value -=  r*count;
-		}else
-			r = 0;
+#include <assert.h>
 
-			// printf("r:%d\n",r );
-			// r = 0;
-		print_g(*currentGiver);
-		// printf("before for\n");
 
-		for (i = 0; i < count; ++i)
-		{
-			giver_name = get_line(fin);
-			Giver *giver = get_giver(giver_name, givers, givers_count);
-			// printf("%s\n", giver_name);
-			// printf("giver:%s\n",giver->name );
-			print_g(*giver);
-		
-			giver->final_money_value += r;
-			currentGiver->final_money_value -= r;
-		
+typedef struct Person Person;
 
-			print_g(*giver);
-		
-		}
+struct Person
+{
+	char name[MAX_NAME];
+	int total;
+};
 
-		// printf("before get_line\n");b
-		giver_name = get_line(fin);
-	}
-	money = 10;
-	for (i = 0; i < givers_count; ++i)
+Person people[MAX_PEOPLE];
+int npeople = 0;
+
+void add_person(char *name){
+	assert(npeople < MAX_PEOPLE);
+	strcpy(people[npeople].name, name);
+	npeople++;
+}
+
+Person *lookup(char *name){
+	int i;
+
+	for (i = 0; i < npeople; ++i)
 	{
-		fprintf(fout, "%s %d\n", givers[i].name , givers[i].final_money_value - givers[i].initial_money_value);
+		if(strcmp(name, people[i].name) == 0){
+			return &people[i];
+		}
 	}
-	fclose(fin);
-	fclose(fout);
-	// while( fgets(comet, sizeof comet, fin) != NULL ){
-		
-	exit(0);
+
+	assert(0);
+}
+
+
+int main(){
+
+	FILE *fin = fopen("gift1.in", "r");
+	FILE *fout = fopen("gift1.out", "w");
+	char name[MAX_NAME];
+	int i, j, np, ng, amt;
+	Person *giver, *receiver;
+
+	fscanf(fin, "%d", &np);
+	for (i = 0; i < np; ++i)
+	{
+		fscanf(fin, "%s", name);
+		add_person(name);
+	}
+
+	/*process gift lines*/
+	for (i = 0; i < np; ++i)
+	{
+		fscanf(fin, "%s %d %d", name, &amt, &ng);
+		giver = lookup(name); 
+		for (j = 0; j < ng; ++j)
+		{
+			fscanf(fin, "%s", name);
+			receiver = lookup(name);
+			giver->total -= amt/ng;
+			receiver->total += amt/ng;
+		}
+	}
+
+	/*print the format*/
+
+	for (i = 0; i < np; ++i)
+	{
+		fprintf(fout, "%s %d\n", people[i].name, people[i].total );
+	}
+
 }
