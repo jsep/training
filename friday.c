@@ -28,60 +28,41 @@ int months_days [] = {
 				31 // DEC 
 			};
 
+int isleap(int y){
+	return (y%4 == 0 && (y%100 != 0 || y%400 == 0));
+}
+
+int month_length(int y, int m){
+
+	if( m == 1 ){ /* Febrary */
+		return months_days[m]+isleap(y);
+	}else
+		return months_days[m];
+}
+
 int main(int argc, char const *argv[])
 {
 	FILE *fin = fopen("friday.in", "r");
 	FILE *fout = fopen("friday.out", "w");
 	// FILE *fout = stdout;
-	int i, j, N;
-	char n[6];
-	int year = 0;
-	int day = 0;
-	int weekDay = 0;
-	int month = 0;
+	int i, year, month, dayOfWeak, N;
 	int days[7] = {0, 0, 0, 0, 0, 0, 0};
-	int leap_day = 0;
+
 	fscanf(fin, "%d", &N);
-	// printf("yeah!\n");
-
+	dayOfWeak = 0; /* January 13h 1900 is Saturday = 0*/
+	
 	for (year = 1900; year < 1900+N; ++year){
-
-
-		
-		
-		for (month = 0; month < 12; ++month)
-		{
-			if(month == 1)
-				leap_day = (year%100 == 0 )? year%400 == 0: year%4 == 0;
-			else 
-				leap_day = 0;
-			// printf("year:%d %d\n", year, leap_day);		
-			
-			for (day = 0; day < months_days[month] + leap_day; ++day){
-		
-
-				// printf("day: %d weekDay: %d %s, month: %d %s \n", day, weekDay, Days[weekDay], month, Months[month]);
-				if(day == 12){
-					// printf("13 day %s %s\n ", Days[weekDay], Months[month]);
-					days[weekDay]++;
-				}
-				weekDay++;
-				if( weekDay == 7)
-					weekDay = 0;
-			
-			}
-		}
-	// printf("--------------------------\n");
-
-		
+	
+		for (month = 0; month < 12; ++month){
+			days[dayOfWeak]++;
+			dayOfWeak = (dayOfWeak+ month_length(year, month)) % 7;
+		}		
 	}
 
-	fprintf(fout, "%d %d ", days[5], days[6]);
-	for (i = 0; i < 5; ++i)
-	{
-		fprintf(fout, "%d", days[i]);
-		if(i!=4)
+	for (i = 0; i < 7; ++i){
+		if(i)
 			fprintf(fout, " ");
+		fprintf(fout, "%d", days[i]);		
 	}
 	fprintf(fout, "\n");
 	return 0;
